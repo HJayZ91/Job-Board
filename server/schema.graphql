@@ -1,0 +1,26 @@
+# the .graphql extension tells the editor this is a GraphQL schema definite language file
+type Query {
+    company(id: ID!): Company
+    job(id: ID!): Job
+    jobs: [Job!]
+}
+
+type Company {
+    id: ID!
+    name: String!
+    description: String
+    jobs: [Job!]!
+}
+
+# graphql allows us to define custom types by writing type then the name like "Job"
+"""
+Represents a job ad posted to our board.
+"""
+type Job {
+    id: ID! # ID! means this field is required, or non-nullable
+    """The __date__ when the job was published, in ISO-8601 format. E.g. `2002-12-31`."""
+    date: String!
+    title: String!
+    company: Company!
+    description: String
+}
