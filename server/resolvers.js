@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { getCompany } from './db/companies.js';
 import { getJobsByCompany, getJob, getJobs } from './db/jobs.js';
+import { createJob } from './db/jobs.js';
 
 //export the object called "resolvers"
 export const resolvers = {
@@ -20,6 +21,13 @@ export const resolvers = {
             return job;
         },        
         jobs: () => getJobs(),
+    },
+
+    Mutation: {
+        createJob: (_root, { input: { title, description }}) => {
+            const companyId = 'FjcJCHJALA4i'; // TODO set based on user
+            return createJob({ companyId, title, description })
+        },
     },
 
     Company: {
