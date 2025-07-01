@@ -11,6 +11,7 @@ import { readFile } from 'node:fs/promises';
 import { authMiddleware, handleLogin } from './auth.js';
 //import the resolvers object from the local module we created in the resolvers.js file
 import { resolvers } from './resolvers.js';
+import { getUser } from './db/users.js';
 
 const PORT = 9000;
 
@@ -29,7 +30,15 @@ const apolloServer = new ApolloServer({ typeDefs, resolvers });
 await apolloServer.start();
 /*we again call app.use but only apply it to a specific path and we call the apolloMiddleware function in the second position.
 express will now send all requests to this path to the "apolloMiddle" so it will be handled by the Apollo GraphQL engine*/
-app.use('/graphql', apolloMiddleware(apolloServer));
+app.use('/graphql', apolloMiddleware(apolloServer, { context: getContext }));
+
+async function getContext({ req }) {
+  if (req.auth) {
+    const user = await getUser(req.auth.sub);
+    return { user };
+  }
+  return {};
+}
 
 app.listen({ port: PORT }, () => {
   console.log(`Server running on port ${PORT}`);
