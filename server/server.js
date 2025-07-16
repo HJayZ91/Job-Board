@@ -10,6 +10,7 @@ import express from 'express';
 import { readFile } from 'node:fs/promises';
 import { authMiddleware, handleLogin } from './auth.js';
 //import the resolvers object from the local module we created in the resolvers.js file
+import { createCompanyLoader } from './db/companies.js';
 import { resolvers } from './resolvers.js';
 import { getUser } from './db/users.js';
 
@@ -33,11 +34,12 @@ express will now send all requests to this path to the "apolloMiddle" so it will
 app.use('/graphql', apolloMiddleware(apolloServer, { context: getContext }));
 
 async function getContext({ req }) {
+  const companyLoader = createCompanyLoader();
+  const context = { companyLoader };
   if (req.auth) {
-    const user = await getUser(req.auth.sub);
-    return { user };
+    context.user = await getUser(req.auth.sub);
   }
-  return {};
+  return context;
 }
 
 app.listen({ port: PORT }, () => {
